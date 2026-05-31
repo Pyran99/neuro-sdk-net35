@@ -1,15 +1,18 @@
 This fork changes the Unity scripts to allow modding 'older' Unity games (2017) that use .Net 3.5 with BepInEx 5.
 
-
->Changes from the original
+Changes from the original
 >1. Newtonsoft Json downgraded to version 12.0.3 -- version 13+ does not work with the net35 framework
 >2. NativeWebSocket replaced with WebSocketSharp
 >3. Tasks used from TaskParallelLibrary
 
 ## Usage
-1. Use BepInEx to create a project using the BepInEx 5 Plugin template (https://docs.bepinex.dev/master/articles/dev_guide/plugin_tutorial/1_setup.html). In the .csproj file set the TargetFramework to net35. cmd prompt with templates installed (dotnet new bepinex5plugin -n YOUR_MOD_NAME -T net35 -U TARGET_GAMES_UNITY_VERSION)
-2. Add the packages from NuGet [WebSocketSharp](https://www.nuget.org/packages/WebSocketSharp/) [TaskParallelLibrary](https://www.nuget.org/packages/TaskParallelLibrary) [Newtonsoft Json](https://www.nuget.org/packages/Newtonsoft.Json/12.0.3)
-3. Copy the contents of (./ModdingUnity/Mod/NeuroSdk)<ModdingUnity\Mod\NeuroSdk> into your project
+1. Use BepInEx to create a project using the BepInEx 5 Plugin template [BepInEx](https://docs.bepinex.dev/master/articles/dev_guide/plugin_tutorial/1_setup.html).
+In the .csproj file set the TargetFramework to net35. cmd prompt with templates installed: `dotnet new bepinex5plugin -n YOUR_MOD_NAME -T net35 -U TARGET_GAMES_UNITY_VERSION`
+2. Add the packages from NuGet 
+    >[WebSocketSharp](https://www.nuget.org/packages/WebSocketSharp/) 
+    >[TaskParallelLibrary](https://www.nuget.org/packages/TaskParallelLibrary) 
+    >[Newtonsoft Json](https://www.nuget.org/packages/Newtonsoft.Json/12.0.3)
+3. Copy the contents of [Mod/NeuroSdk](./ModdingUnity/Mod/NeuroSdk) into your project
 
 
 
