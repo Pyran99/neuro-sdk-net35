@@ -5,13 +5,16 @@ Changes from the original
 >2. NativeWebSocket replaced with WebSocketSharp
 >3. Tasks used from TaskParallelLibrary
 
+This was tested with a game using Unity 2017.2.2 . Older versions may work as long as they use .Net 3.5
+
 ## Usage
 1. Use BepInEx to create a project using the BepInEx 5 Plugin template [BepInEx](https://docs.bepinex.dev/master/articles/dev_guide/plugin_tutorial/1_setup.html).
-In the .csproj file set the TargetFramework to net35. cmd prompt with templates installed: `dotnet new bepinex5plugin -n YOUR_MOD_NAME -T net35 -U TARGET_GAMES_UNITY_VERSION`
-2. Add the packages from NuGet
+In the .csproj file make sure the TargetFramework is net35.
+cmd prompt with templates installed: `dotnet new bepinex5plugin -n YOUR_MOD_NAME -T net35 -U TARGET_GAMES_UNITY_VERSION`
+3. Add the packages from NuGet
    - [WebSocketSharp](https://www.nuget.org/packages/WebSocketSharp/)
    - [TaskParallelLibrary](https://www.nuget.org/packages/TaskParallelLibrary)
-   - [Newtonsoft Json](https://www.nuget.org/packages/Newtonsoft.Json/12.0.3)
+   - [Newtonsoft Json 12.0.3](https://www.nuget.org/packages/Newtonsoft.Json/12.0.3)
 4. Copy the contents of [Mod/NeuroSdk](./ModdingUnity/Mod/NeuroSdk) into your project
 
 
