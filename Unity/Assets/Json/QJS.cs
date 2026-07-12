@@ -9,7 +9,6 @@ namespace NeuroSdk.Json
     /// <summary>
     /// Utility class for generating quick JSON schemas
     /// </summary>
-    // ReSharper disable once InconsistentNaming
     public static class QJS
     {
         private static JsonSchema Const<T>(T value)
@@ -37,7 +36,8 @@ namespace NeuroSdk.Json
         public static JsonSchema Const(IEnumerable<float> values) => Const<IEnumerable<float>>(values);
         public static JsonSchema Const(IEnumerable<bool> values) => Const<IEnumerable<bool>>(values);
 
-        public static JsonSchema ConstEmptyArray => Const(Array.Empty<object>());
+        public static JsonSchema ConstEmptyArray => Const(new object[] {});
+        // public static JsonSchema ConstEmptyArray => Const(Array.Empty<object>());
         public static JsonSchema ConstNull => new JsonSchema.ConstNull();
 
         public static JsonSchema Enum(IEnumerable<string> values) => Enum<string>(values);
@@ -52,7 +52,8 @@ namespace NeuroSdk.Json
             };
         }
 
-        public static JsonSchema WrapObject(IReadOnlyDictionary<string, JsonSchema> properties, bool makePropertiesRequired = true)
+        public static JsonSchema WrapObject(Dictionary<string, JsonSchema> properties, bool makePropertiesRequired = true)
+        // public static JsonSchema WrapObject(IReadOnlyDictionary<string, JsonSchema> properties, bool makePropertiesRequired = true)
         {
             JsonSchema result = new()
             {

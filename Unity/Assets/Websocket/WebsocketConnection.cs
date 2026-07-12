@@ -2,15 +2,17 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Text;
 using System.Threading.Tasks;
-using NativeWebSocket;
 using NeuroSdk.Il2Cpp;
 using NeuroSdk.Internal;
 using NeuroSdk.Messages.API;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+// using NativeWebSocket;
+using WebSocketSharp;
 
 namespace NeuroSdk.Websocket
 {
@@ -25,7 +27,6 @@ namespace NeuroSdk.Websocket
         public string CharacterId { get; }
         public string DisplayName { get; }
     }
-
 #pragma warning disable CS0618 // Type or member is obsolete
     [RegisterInIl2Cpp]
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -56,7 +57,8 @@ namespace NeuroSdk.Websocket
 
         public UnityEvent? onConnected;
         public UnityEvent<string>? onError;
-        public UnityEvent<WebSocketCloseCode>? onDisconnected;
+        public UnityEvent<CloseEventArgs>? onDisconnected;
+        // public UnityEvent<WebSocketCloseCode>? onDisconnected;
         public UnityEvent<CharacterMetadata>? onCharacterChanged;
 
         private void Awake()
@@ -92,7 +94,8 @@ namespace NeuroSdk.Websocket
 
             try
             {
-                if (_socket?.State is WebSocketState.Open or WebSocketState.Connecting) _ = _socket.Close();
+                if (_socket?.ReadyState is WebSocketState.Open or WebSocketState.Connecting) _socket.Close();
+                // if (_socket?.State is WebSocketState.Open or WebSocketState.Connecting) _ = _socket.Close();
             }
             catch
             {
@@ -117,10 +120,14 @@ namespace NeuroSdk.Websocket
 
             // Websocket callbacks get run on separate threads! Watch out
             _socket = new WebSocket(websocketUrl);
-            _socket.OnOpen += () =>
+
+            #region Open
+
+            _socket.OnOpen += SocketOpened;
+            void SocketOpened(object? sender, EventArgs e)
             {
-                // ReSharper disable once ArrangeThisQualifier -- Il2Cpp has this as an extension method
-                this.StartCoroutine(coroutine());
+                Debug.Log("Websocket connection opened");
+                StartCoroutine(coroutine());
                 return;
 
                 IEnumerator coroutine()
@@ -128,54 +135,127 @@ namespace NeuroSdk.Websocket
                     yield return null;
                     onConnected?.Invoke();
                 }
-            };
-            _socket.OnMessage += bytes =>
+            }
+            /// replaced code
+            // _socket.OnOpen += () =>
+            // {
+            //     // ReSharper disable once ArrangeThisQualifier -- Il2Cpp has this as an extension method
+            //     this.StartCoroutine(coroutine());
+            //     return;
+
+            //     IEnumerator coroutine()
+            //     {
+            //         yield return null;
+            //         onConnected?.Invoke();
+            //     }
+            // };
+
+            #endregion
+
+            #region Receive Message
+
+            _socket.OnMessage += SocketMessage;
+            void SocketMessage(object? sender, MessageEventArgs e)
             {
-                string message = Encoding.UTF8.GetString(bytes);
-                // ReSharper disable once ArrangeThisQualifier -- Il2Cpp has this as an extension method
-                this.StartCoroutine(ReceiveMessage(message));
-            };
-            _socket.OnError += error =>
+                StartCoroutine(ReceiveMessage(e.Data));
+            }
+            /// replaced code
+            // _socket.OnMessage += bytes =>
+            // {
+            //     string message = Encoding.UTF8.GetString(bytes);
+            //     // ReSharper disable once ArrangeThisQualifier -- Il2Cpp has this as an extension method
+            //     this.StartCoroutine(ReceiveMessage(message));
+            // };
+            #endregion
+
+            #region Error
+
+            _socket.OnError += SocketError;
+            void SocketError(object? sender, WebSocketSharp.ErrorEventArgs e)
             {
-                // ReSharper disable once ArrangeThisQualifier -- Il2Cpp has this as an extension method
-                this.StartCoroutine(coroutine());
+                StartCoroutine(coroutine());
                 return;
 
                 IEnumerator coroutine()
                 {
                     yield return null;
 
-                    onError?.Invoke(error);
-                    if (error != "Unable to connect to the remote server")
+                    onError?.Invoke(e.Message);
+                    if (e.Message != "Unable to connect to the remote server")
                     {
                         Debug.LogError("Websocket connection has encountered an error!");
-                        Debug.LogError(error);
+                        Debug.LogError(e.Message);
                     }
                 }
-            };
-            _socket.OnClose += code =>
+            }
+            /// replaced code
+            // _socket.OnError += error =>
+            // {
+            //     // ReSharper disable once ArrangeThisQualifier -- Il2Cpp has this as an extension method
+            //     this.StartCoroutine(coroutine());
+            //     return;
+
+            //     IEnumerator coroutine()
+            //     {
+            //         yield return null;
+
+            //         onError?.Invoke(error);
+            //         if (error != "Unable to connect to the remote server")
+            //         {
+            //             Debug.LogError("Websocket connection has encountered an error!");
+            //             Debug.LogError(error);
+            //         }
+            //     }
+            // };
+            #endregion
+
+            #region Close
+
+            _socket.OnClose += SocketClosed;
+            void SocketClosed(object? sender, CloseEventArgs e)
             {
-                // ReSharper disable once ArrangeThisQualifier -- Il2Cpp has this as an extension method
-                this.StartCoroutine(coroutine());
+                StartCoroutine(coroutine());
                 return;
 
                 IEnumerator coroutine()
                 {
                     yield return null;
+                    Debug.LogWarning($"Websocket connection has been closed with code: {e.Code} & reason: {e.Reason}!");
+                    onDisconnected?.Invoke(e);
+                    StartCoroutine(Reconnect());
 
-                    onDisconnected?.Invoke(code);
-                    if (code != WebSocketCloseCode.Abnormal) Debug.LogWarning($"Websocket connection has been closed with code {code}!");
-                    // ReSharper disable once ArrangeThisQualifier -- Il2Cpp has this as an extension method
-                    this.StartCoroutine(Reconnect());
+                    // onDisconnected?.Invoke(e.Code);
+                    // if (e.Code != WebSocketCloseCode.Abnormal) Debug.LogWarning($"Websocket connection has been closed with code {code}!");
+                    // StartCoroutine(Reconnect());
                 }
-            };
+            }
+            /// replaced code
+            // _socket.OnClose += code =>
+            // {
+            //     // ReSharper disable once ArrangeThisQualifier -- Il2Cpp has this as an extension method
+            //     this.StartCoroutine(coroutine());
+            //     return;
 
-            _ = _socket.Connect();
+            //     IEnumerator coroutine()
+            //     {
+            //         yield return null;
+
+            //         onDisconnected?.Invoke(code);
+            //         if (code != WebSocketCloseCode.Abnormal) Debug.LogWarning($"Websocket connection has been closed with code {code}!");
+            //         // ReSharper disable once ArrangeThisQualifier -- Il2Cpp has this as an extension method
+            //         this.StartCoroutine(Reconnect());
+            //     }
+            // };
+            #endregion
+            
+            _socket.Connect();
+            // _ = _socket.Connect();
         }
 
         private void Update()
         {
-            if (_socket?.State is not WebSocketState.Open) return;
+            if (_socket?.ReadyState is not WebSocketState.Open) return;
+            // if (_socket?.State is not WebSocketState.Open) return;
 
             while (messageQueue.Count > 0)
             {
@@ -185,7 +265,7 @@ namespace NeuroSdk.Websocket
             }
 
 #if !UNITY_WEBGL || UNITY_EDITOR
-            _socket.DispatchMessageQueue();
+            // _socket.DispatchMessageQueue();
 #endif
         }
 
@@ -196,8 +276,8 @@ namespace NeuroSdk.Websocket
 
             Debug.Log($"Sending ws message {message}");
 
-            Task task = _socket!.SendText(message);
-            // ReSharper disable once RedundantDelegateCreation
+            Task task = Task.Factory.StartNew(() => _socket!.Send(message));
+            // Task task = _socket!.SendText(message);
             yield return new WaitUntil(new Func<bool>(() => task.IsCompleted));
 
             if (task.IsCanceled || task.IsFaulted)
@@ -222,7 +302,8 @@ namespace NeuroSdk.Websocket
         {
             string message = Jason.Serialize(messageBuilder.GetWsMessage());
 
-            if (_socket?.State is not WebSocketState.Open)
+            if (_socket?.ReadyState is not WebSocketState.Open)
+            // if (_socket?.State is not WebSocketState.Open)
             {
                 Debug.LogError($"WS not open - failed to send immediate ws message {message}");
                 return;
@@ -230,7 +311,8 @@ namespace NeuroSdk.Websocket
 
             Debug.Log($"Sending immediate ws message {message}");
 
-            _socket.SendText(message);
+            _socket.Send(message);
+            // _socket.SendText(message);
         }
 
         [Il2CppHide]
@@ -262,4 +344,38 @@ namespace NeuroSdk.Websocket
             }
         }
     }
+
+    // was missing from files
+    public class MainThreadUtil : MonoBehaviour
+    {
+        private static readonly ConcurrentQueue<Action> _executionQueue = new();
+        public static MainThreadUtil? Instance;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void Setup()
+        {
+            if (Instance == null)
+            {
+                var obj = new GameObject("MainThreadUtil");
+                Instance = obj.AddComponent<MainThreadUtil>();
+                DontDestroyOnLoad(obj);
+            }
+        }
+
+        private void Update()
+        {
+            while (_executionQueue.TryDequeue(out var action))
+            {
+                Debug.Log("invoke action in queue");
+                action?.Invoke();
+            }
+        }
+
+        public static void RunOnMainThread(Action action)
+        {
+            if (action == null) return;
+            _executionQueue.Enqueue(action);
+        }
+    }
+
 }
