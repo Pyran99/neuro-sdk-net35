@@ -1,6 +1,6 @@
 This fork changes the Unity scripts to allow modding 'older' Unity games (2017) that use .Net 3.5 with BepInEx 5.
 
-Changes from the original
+Library dependency changes
 >1. Newtonsoft Json downgraded to version 12.0.3 -- version 13+ does not work with the net35 framework
 >2. NativeWebSocket replaced with WebSocketSharp
 >3. Tasks used from TaskParallelLibrary

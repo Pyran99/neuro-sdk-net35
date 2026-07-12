@@ -16,6 +16,17 @@ using WebSocketSharp;
 
 namespace NeuroSdk.Websocket
 {
+    public sealed class CharacterMetadata
+    {
+        public CharacterMetadata(string characterId, string displayName)
+        {
+            CharacterId = characterId;
+            DisplayName = displayName;
+        }
+
+        public string CharacterId { get; }
+        public string DisplayName { get; }
+    }
 #pragma warning disable CS0618 // Type or member is obsolete
     [RegisterInIl2Cpp]
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -42,11 +53,13 @@ namespace NeuroSdk.Websocket
         public string game = "";
         public MessageQueue messageQueue = null!;
         public CommandHandler commandHandler = null!;
+        public CharacterMetadata? Character { get; private set; }
 
         public UnityEvent? onConnected;
         public UnityEvent<string>? onError;
         public UnityEvent<CloseEventArgs>? onDisconnected;
         // public UnityEvent<WebSocketCloseCode>? onDisconnected;
+        public UnityEvent<CharacterMetadata>? onCharacterChanged;
 
         private void Awake()
         {
@@ -276,6 +289,13 @@ namespace NeuroSdk.Websocket
 
         [Il2CppHide]
         public void Send(OutgoingMessageBuilder messageBuilder) => messageQueue.Enqueue(messageBuilder);
+
+        [Il2CppHide]
+        public void SetCharacterMetadata(CharacterMetadata metadata)
+        {
+            Character = metadata;
+            onCharacterChanged?.Invoke(metadata);
+        }
 
         [Il2CppHide]
         public void SendImmediate(OutgoingMessageBuilder messageBuilder)
