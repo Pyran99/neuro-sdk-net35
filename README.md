@@ -15,20 +15,12 @@ cmd prompt with templates installed: `dotnet new bepinex5plugin -n YOUR_MOD_NAME
    - [WebSocketSharp](https://www.nuget.org/packages/WebSocketSharp/)
    - [TaskParallelLibrary](https://www.nuget.org/packages/TaskParallelLibrary)
    - [Newtonsoft Json 12.0.3](https://www.nuget.org/packages/Newtonsoft.Json/12.0.3)
-3. Copy the contents of [Mod/NeuroSdk](./ModdingUnity/Mod/NeuroSdk) into your project
-
-## Issues
-- [x] `_currentlyRegisteredActions` is being set to null! by OnApplicationQuit before an active ActionWindow may have its OnDestroy or End called, which then calls `UnregisterActions`
-```
-private void OnApplicationQuit(){
-   WebsocketConnection.Instance!.SendImmediate(new ActionsUnregister(_currentlyRegisteredActions));
-   _currentlyRegisteredActions = null!;
-}
-
-public static void UnregisterActions(IEnumerable<string> removeActionsList){
-   INeuroAction[] actionsToRemove = _currentlyRegisteredActions.Where(oldAction => removeActionsList.Any(removeAction => oldAction.Name == removeAction)).ToArray();}
-```
-
+### Manual
+1. Download the **NeuroSDK** branch
+2. copy contents of Unity/Assets into your project
+### Clone
+1. clone this repo into your project
+2. change branch to **NeuroSDK**
 
 
 # <img src="Assets/icon.png" width="29" style="vertical-align:middle;">  Neuro SDK
