@@ -25,10 +25,10 @@ Answers to common questions about making an integration that Neuro plays well wi
 ## Action Results
 
 - Send the result as soon as you have _validated_ the action, before executing it in-game. Every second of delay is a second Neuro spends frozen waiting.
-- If no result arrives within a short window (currently around 30 seconds), the server treats the action as failed on its own and discards any late result. Do not rely on this; always answer.
+- If no result arrives within a short window (currently around 20 seconds), the server treats the action as failed on its own and discards any late result. Do not rely on this; always answer.
 - A `success: false` result during an actions force is automatically retried (a limited number of times). Write the `message` as an actionable error, e.g. `"You can't discard a card that isn't in your hand. Your hand is: ..."`, so the retry can actually succeed.
 - Outside of a force there is no automatic retry: she reads the failure message and decides for herself whether to try again.
-- On success, only include a `message` when there is something genuinely worth telling her; most successful results don't need one.
+- On success, use the `message` to describe any state that changed as a result of her action that would be helpful for her to know (e.g. the card she drew, the new board state). If nothing meaningful changed, omit it.
 
 ## Forcing Actions
 

@@ -169,7 +169,7 @@ This message needs to be sent as soon as possible after an action is validated, 
 > Until you send an action result, Neuro will just be waiting for the result of her action!  
 > Please make sure to send this as soon as possible.   
 > It should usually be sent after validating the action parameters, before it is actually executed in-game.  
-> If you take too long (currently more than about 30 seconds), the server will give up, treat the action as failed, and discard your result if it ever arrives.
+> If you take too long (currently more than about 20 seconds), the server will give up, treat the action as failed, and discard your result if it ever arrives.
 
 ```ts
 {
