@@ -63,6 +63,12 @@ Third-party SDKs created and maintained by the community.
 - [Jippity](https://github.com/EnterpriseScratchDev/neuro-api-jippity) is a testing tool that aims to be a more "realistic" version of Randy, by using OpenAI to mimic Neuro.
 - [Gary](https://github.com/Govorunb/gary) is another backend implementation for advanced use. Originally created for testing with local LLMs like Llama, now also has support for a Randy-like "random generator" mode and a web UI for Tony-like manual sending.
 
+#### Server SDKs
+Useful if you're building a simulator server for testing purposes.
+
+- [JavaScript/TypeScript SDK](https://github.com/KTrain5169/typescript-neuro-game-api)
+- [Python SDK](https://github.com/CoolCat467/Neuro-API) (import from `neuro_api.server`)
+
 </details>
 
 ## Information 
